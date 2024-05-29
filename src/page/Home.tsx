@@ -10,7 +10,12 @@ export default function Home() {
 
   const getProduct = async () => {
     try {
-      const result = await axios.get('https://dummyjson.com/products');
+      const result = await axios.get('https://dummyjson.com/products',{
+        headers: {
+          CMReq: 'request',
+        },
+      });
+      console.log(result)
       setProducts(result.data.products);
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -116,7 +121,7 @@ export default function Home() {
                 <td>{product.stock}</td>
                 {operation === 'totalPrice' && <td>{product.totalPrice}</td>}
                 <td>
-                  <Link to={`/detail/${product.id}`} state={product}>
+                  <Link to={`/detail/${product.id}`}>
                     <button className="underline text-blue-400">
                       Details
                     </button>

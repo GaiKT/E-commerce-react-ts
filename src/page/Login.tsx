@@ -1,6 +1,7 @@
 import { useForm, SubmitHandler } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
+import { useAuth } from "../contexts/auth";
 import { useNavigate } from "react-router-dom";
 
 interface IFormInput {
@@ -17,16 +18,17 @@ const loginSchema = yup
 
 export default function Login() {
     const navigate = useNavigate();
+    const {login} = useAuth()
     const { register, handleSubmit, setError,
         formState:{errors} , 
      } = useForm<IFormInput>({resolver: yupResolver(loginSchema)})
 
     const onSubmit: SubmitHandler<IFormInput> = (data) => {
         console.log(data)
-        if (data.username === 'aa@bb.cc' && data.password === '12345678') {
-            console.log('login succesfully!')
-            navigate('./home')
-        }else{
+        try {
+            login(data)
+            navigate("/home");
+        }catch(error){
             setError("password",{
                 message : "Email or password incorrect"
             })

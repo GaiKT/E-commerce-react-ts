@@ -7,9 +7,10 @@ import { useNavigate } from "react-router-dom";
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
   const [inputText, setInputText] = useState('');
+  const [debouncedInputText, setDebouncedInputText] = useState('');
   const [operation, setOperation] = useState('all');
-  const nevigate = useNavigate()
-
+  const navigate = useNavigate();
+  
   const getProduct = useCallback(async () => {
     try {
       const result = await axios.get('https://dummyjson.com/products');
@@ -23,6 +24,16 @@ export default function Home() {
     getProduct();
   }, [getProduct]);
 
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedInputText(inputText);
+    }, 1000);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [inputText]);
+
   const more1000AndDiscount = useCallback((arr: Product[]) => {
     return arr.filter(item => item.price >= 1000 && item.discountPercentage > 0);
   }, []);
@@ -30,7 +41,7 @@ export default function Home() {
   const addTotalPrice = useCallback((arr: Product[]) => {
     return arr.map(item => ({
       ...item,
-      totalPrice: item.price - item.price * item.discountPercentage / 100,
+      totalPrice: item.price - (item.price * item.discountPercentage / 100),
     }));
   }, []);
 
@@ -46,26 +57,32 @@ export default function Home() {
   const filterAndSortProducts = useMemo(() => {
     let filteredProducts = [...products];
 
-    if (operation === '1000up') {
-      filteredProducts = more1000AndDiscount(filteredProducts);
-    } else if (operation === 'totalPrice') {
-      filteredProducts = addTotalPrice(filteredProducts);
-    } else if (operation === 'rating') {
-      filteredProducts = sortProductRatingAndPrice(filteredProducts);
+    switch (operation) {
+      case '1000up':
+        filteredProducts = more1000AndDiscount(filteredProducts);
+        break;
+      case 'totalPrice':
+        filteredProducts = addTotalPrice(filteredProducts);
+        break;
+      case 'rating':
+        filteredProducts = sortProductRatingAndPrice(filteredProducts);
+        break;
+      default:
+        break;
     }
 
-    if (inputText) {
+    if (debouncedInputText) {
       filteredProducts = filteredProducts.filter(product =>
-        product.title.toLowerCase().includes(inputText.toLowerCase())
+        product.title.toLowerCase().includes(debouncedInputText.toLowerCase())
       );
     }
 
     return filteredProducts;
-  }, [products, inputText, operation, more1000AndDiscount, addTotalPrice, sortProductRatingAndPrice]);
+  }, [products, debouncedInputText, operation, more1000AndDiscount, addTotalPrice, sortProductRatingAndPrice]);
 
-  const nevigatePage = (product_id:number) => {
-    nevigate('/detail/' + product_id)
-  }
+  const navigatePage = (product_id: number) => {
+    navigate('/detail/' + product_id);
+  };
 
   if (products.length === 0) {
     return <div className="h-screen flex justify-center items-center">Loading...</div>;
@@ -73,7 +90,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col items-center pb-10 gap-3">
-      <Navbar/>
+      <Navbar />
       <p className="text-4xl font-bold my-4">Products</p>
       <div className="w-full flex justify-center gap-5 max-md:flex-col max-md:p-4">
         <div className="md:w-1/6 border p-4 flex flex-col gap-4 h-full text-center bg-white rounded-md shadow-md">
@@ -95,7 +112,7 @@ export default function Home() {
             >
               <option value="all">All</option>
               <option value="1000up">1000</option>
-              <option value="totalPrice">Totalprice</option>
+              <option value="totalPrice">Total Price</option>
               <option value="rating">Rating</option>
             </select>
           </div>
@@ -107,29 +124,28 @@ export default function Home() {
               <th className="border">Title</th>
               <th className="border">Price</th>
               <th className="border">Stock</th>
-              {operation === 'totalPrice' && <th className="border border-slate-300">Total</th>}
+              {operation === 'totalPrice' && <th className="border">Total</th>}
             </tr>
           </thead>
           <tbody>
-            {filterAndSortProducts.map((product, index) => (
-                <tr key={index} onClick={()=> nevigatePage(product.id)} className="hover:bg-slate-100 cursor-pointer">
-                  <td className="flex justify-center">
-                    <img src={product.thumbnail} alt={`${product.title} image`} className="w-20" />
-                  </td>
-                  <td>{product.title}</td>
-                  <td>{product.price}</td>
-                  <td>{product.stock}</td>
-                  {operation === 'totalPrice' && <td>{product.totalPrice.toFixed(2)}</td>}
-                </tr>
-              ))}
-                {
-                filterAndSortProducts.length === 0 &&
-                <tr>
-                  <td colSpan={5} className="h-14">
-                    No products match your keyword.
-                  </td>
-                </tr>
-              }
+            {filterAndSortProducts.map((product) => (
+              <tr key={product.id} onClick={() => navigatePage(product.id)} className="hover:bg-slate-100 cursor-pointer">
+                <td className="flex justify-center">
+                  <img src={product.thumbnail} alt={`${product.title} image`} className="w-20" />
+                </td>
+                <td>{product.title}</td>
+                <td>{product.price}</td>
+                <td>{product.stock}</td>
+                {operation === 'totalPrice' && <td>{product.totalPrice.toFixed(2)}</td>}
+              </tr>
+            ))}
+            {filterAndSortProducts.length === 0 && (
+              <tr>
+                <td colSpan={5} className="h-14">
+                  No products match your keyword.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

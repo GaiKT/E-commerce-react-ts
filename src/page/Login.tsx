@@ -3,6 +3,11 @@ import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
 import { useAuth } from "../contexts/auth";
 import { useNavigate } from "react-router-dom";
+import Button from '@mui/material/Button';
+import { Box } from "@mui/material";
+import { TextField} from '@mui/material';
+import Typography from '@mui/material/Typography';
+import StoreMallDirectoryIcon from '@mui/icons-material/StoreMallDirectory';
 
 interface IFormInput {
     username: string
@@ -24,7 +29,6 @@ export default function Login() {
      } = useForm<IFormInput>({resolver: yupResolver(loginSchema)})
 
     const onSubmit: SubmitHandler<IFormInput> = (data) => {
-        console.log(data)
         try {
             login(data)
             navigate("/home");
@@ -36,23 +40,53 @@ export default function Login() {
     }
 
   return (
-    <div className="min-h-screen flex justify-center items-center">
-        <form onSubmit={handleSubmit(onSubmit)} className="p-10 flex flex-col gap-5 text-2xl border rounded-lg shadow-2xl">
-            <p className="text-center font-bold text-4xl">Login</p>
-            <label className="flex gap-4">
-                Username :  
-                <input type="text" {...register("username")} className="border p-2 rounded-md"/>
-            </label>
-            <p className="text-red-500 text-center">{errors.username?.message}</p>
-            <label  className="flex gap-4 justify-between"> 
-                Password : 
-                <input type="password" {...register("password")} className="border p-2 rounded-md"/>
-            </label>
-            <p className="text-red-500 text-center">{errors.password?.message}</p>
-            <div className="flex justify-center">
-                <button type="submit"  className="p-2 rounded-md bg-green-600 text-white">เข้าสู่ระบบ</button>
-            </div>
-        </form>
-    </div>
+    <Box
+        sx={{
+            display : "flex",
+            justifyContent : "center",
+            alignItems : 'center',
+            height : '100vh',
+        }}
+    >   
+        <div>
+            <Typography sx={{
+                textAlign : 'center',
+                fontSize : '2rem',
+                backgroundColor : '#1976D2',
+                color: 'white'
+            }}>
+               <StoreMallDirectoryIcon/> E-Commerce
+            </Typography>
+            <form onSubmit={handleSubmit(onSubmit)}
+            className="flex p-10 rounded-md flex-col text-center shadow-md font-bold gap-4 bg-white"
+            >   
+                <p className="text-4xl">Login</p>
+                <TextField 
+                label="Username" 
+                variant="outlined" 
+                type="text"
+                {...register("username")}
+                helperText={errors.username?.message}
+                />
+                <TextField 
+                label="Password" 
+                type="password"
+                {...register("password")}           
+                variant="outlined" 
+                helperText={errors.password?.message}
+                />
+                <Button
+                    variant='contained'
+                    type="submit"
+                    sx={{
+                        padding : 1
+                    }}
+                >
+                    เข้าสู่ระบบ
+                </Button>
+            </form>
+        </div>
+
+    </Box>
   )
 }

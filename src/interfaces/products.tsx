@@ -8,7 +8,26 @@ export interface Product {
         totalPrice : number
         rating : number
         images : string[]
-        description : string
+        description:string
         minimumOrderQuantity : number
         availabilityStatus : string
+        quantity : number
+        reviews : {
+                comment:string,
+                date:string,
+                rating:number,
+                reviewerName:string
+                } []
+        brand:string
+        category:string
+        shippingInformation:string
+        sku:string
+        returnPolicy:string
+        warrantyInformation:string
+        weight:number
+        dimensions:{
+                width:number
+                height:number
+                depth:number
+                }
 }

@@ -9,23 +9,25 @@ import { useAuth } from './contexts/auth';
 function App() {
   const {state} = useAuth()
   return (
-    <Router>
-      <Routes>
-        {
-          state.login === false &&
-          <Route path="/*" element={<Login />} />
-        }
-        {
-          state.login === true &&
-          <>
-            <Route path="/*" element={<Home />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/detail/:id" element={<Detail />} />
-            <Route path="/summary" element={<Summary />} />
-          </>    
-        }
-      </Routes>
-    </Router>
+    <div className='bg-slate-100'>
+      <Router>
+        <Routes>
+          {
+            state.login === false &&
+            <Route path="/*" element={<Login />} />
+          }
+          {
+            state.login === true &&
+            <>
+              <Route path="/*" element={<Home />} />
+              <Route path="/home" element={<Home />} />
+              <Route path="/detail/:id" element={<Detail />} />
+              <Route path="/summary" element={<Summary />} />
+            </>    
+          }
+        </Routes>
+      </Router>
+    </div>
   )
 }
 

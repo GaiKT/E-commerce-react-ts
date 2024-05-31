@@ -21,8 +21,6 @@ function AuthProvider({ children }: AuthProviderProps) {
 
   useEffect(() => {
     if (localStorage.getItem("login")) {
-      const userLogin = window.localStorage.getItem("login")
-      console.log(userLogin)
       setState({ login: true });
     } else {
       setState({ login: false });
